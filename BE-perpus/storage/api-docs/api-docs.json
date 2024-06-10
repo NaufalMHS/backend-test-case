@@ -1,0 +1,283 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Library API",
+        "description": "API Documentation for the Library",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/books": {
+            "get": {
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Get list of books",
+                "description": "Returns list of books",
+                "operationId": "getBooksList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Book"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/borrow": {
+            "post": {
+                "tags": [
+                    "Borrow"
+                ],
+                "summary": "Borrow a book",
+                "description": "Borrow a book for a member",
+                "operationId": "borrowBook",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "book_id",
+                                    "member_id"
+                                ],
+                                "properties": {
+                                    "book_id": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
+                                    "member_id": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Borrow"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Member tidak boleh meminjam lebih dari 2 buku"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/return/{id}": {
+            "post": {
+                "tags": [
+                    "Borrow"
+                ],
+                "summary": "Return a borrowed book",
+                "description": "Return a borrowed book by providing the borrow ID",
+                "operationId": "returnBook",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the borrow",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Borrow"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Buku sudah dikembalikan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/members": {
+            "get": {
+                "tags": [
+                    "Members"
+                ],
+                "summary": "Get list of members",
+                "description": "Returns list of members with borrowed books count",
+                "operationId": "getMembersList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": "1"
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "John Doe"
+                                            },
+                                            "borrowed_books": {
+                                                "type": "integer",
+                                                "example": "2"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Book": {
+                "title": "Book",
+                "required": [
+                    "code",
+                    "title",
+                    "author",
+                    "stock"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "ID of the book",
+                        "type": "integer"
+                    },
+                    "code": {
+                        "description": "Code of the book",
+                        "type": "string"
+                    },
+                    "title": {
+                        "description": "Title of the book",
+                        "type": "string"
+                    },
+                    "author": {
+                        "description": "Author of the book",
+                        "type": "string"
+                    },
+                    "stock": {
+                        "description": "Stock of the book",
+                        "type": "integer"
+                    },
+                    "created_at": {
+                        "description": "Creation timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Update timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Borrow": {
+                "title": "Borrow",
+                "properties": {
+                    "id": {
+                        "description": "ID of the borrow",
+                        "type": "integer"
+                    },
+                    "book_id": {
+                        "description": "ID of the borrowed book",
+                        "type": "integer"
+                    },
+                    "member_id": {
+                        "description": "ID of the borrowing member",
+                        "type": "integer"
+                    },
+                    "borrowed_at": {
+                        "description": "Timestamp when the book was borrowed",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "returned_at": {
+                        "description": "Timestamp when the book was returned",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Member": {
+                "title": "Member",
+                "properties": {
+                    "id": {
+                        "description": "ID of the member",
+                        "type": "integer"
+                    },
+                    "name": {
+                        "description": "Name of the member",
+                        "type": "string"
+                    },
+                    "borrowed_books": {
+                        "description": "Count of borrowed books by the member",
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Borrow",
+            "description": "API Endpoints for Borrow Operations"
+        }
+    ]
+}
